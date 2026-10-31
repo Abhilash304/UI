@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Reservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #ffdd57;
+            font-size: 24px;
+        }
+
+        label, select, input, button {
+            width: 100%;
+            margin: 8px 0;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        select, input {
+            background: rgba(255, 255, 255, 0.7);
+            color: black;
+        }
+
+        button {
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .book {
+            background-color: #28a745;
+        }
+
+        .book:hover {
+            background-color: #218838;
+        }
+
+        .cancel {
+            background-color: #dc3545;
+        }
+
+        .cancel:hover {
+            background-color: #c82333;
+        }
+
+        .reset {
+            background-color: #007bff;
+        }
+
+        .reset:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            color: yellow;
+        }
+
+        #price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffdd57;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🚆 Railway Reservation</h1>
+        
+        <label>Choose a Train:</label>
+        <select id="train" onchange="updatePrice()">
+            <option value="">Select Train</option>
+            <option value="Shatabdi Express" data-price="500">Shatabdi Express - ₹500</option>
+            <option value="Rajdhani Express" data-price="750">Rajdhani Express - ₹750</option>
+            <option value="Duronto Express" data-price="1000">Duronto Express - ₹1000</option>
+        </select>
+
+        <label>Select Date:</label>
+        <input type="date" id="date">
+
+        <label>Enter Seat Number:</label>
+        <input type="text" id="seat" placeholder="e.g., A1, B3">
+
+        <p id="price">Price: ₹0</p>
+
+        <button class="book" onclick="bookSeat()">✅ Book Seat</button>
+        <button class="cancel" onclick="cancelBooking()">❌ Cancel Booking</button>
+        <button class="reset" onclick="resetForm()">🔄 Reset</button>
+
+        <p class="message" id="message"></p>
+    </div>
+
+    <script>
+        let bookedSeats = [];
+
+        function updatePrice() {
+            let trainSelect = document.getElementById("train");
+            let selectedTrain = trainSelect.options[trainSelect.selectedIndex];
+            let price = selectedTrain.getAttribute("data-price") || 0;
+            document.getElementById("price").innerHTML = `Price: ₹${price}`;
+        }
+
+        function bookSeat() {
+            let train = document.getElementById("train").value;
+            let date = document.getElementById("date").value;
+            let seat = document.getElementById("seat").value.toUpperCase();
+            let message = document.getElementById("message");
+
+            if (!train || !date || !seat) {
+                message.innerHTML = "⚠️ Please fill all fields!";
+                message.style.color = "yellow";
+                return;
+            }
+
+            if (bookedSeats.includes(seat)) {
+                message.innerHTML = `❌ Seat ${seat} is already booked!`;
+                message.style.color = "red";
+                return;
+            }
+
+            if (confirm(`Confirm booking for seat ${seat} on ${date} for ${train}?`)) {
+                bookedSeats.push(seat);
+                message.innerHTML = `✅ Seat ${seat} booked successfully!`;
+                message.style.color = "#00ff00";
+
+                // Get the selected train price
+                let trainSelect = document.getElementById("train");
+                let selectedTrain = trainSelect.options[trainSelect.selectedIndex];
+                let price = selectedTrain.getAttribute("data-price") || 0;
+
+                // Generate Ticket
+                generateTicket(train, date, seat, price);
+            }
+        }
+
+        function cancelBooking() {
+            let seat = document.getElementById("seat").value.toUpperCase();
+            let message = document.getElementById("message");
+
+            if (!seat) {
+                message.innerHTML = "⚠️ Please enter a seat number!";
+                message.style.color = "yellow";
+                return;
+            }
+
+            if (!bookedSeats.includes(seat)) {
+                message.innerHTML = `❌ Seat ${seat} is not booked!`;
+                message.style.color = "red";
+                return;
+            }
+
+            if (confirm(`Are you sure you want to cancel booking for seat ${seat}?`)) {
+                bookedSeats = bookedSeats.filter(s => s !== seat);
+                message.innerHTML = `❌ Booking for seat ${seat} canceled!`;
+                message.style.color = "#ff4444";
+            }
+        }
+
+        function resetForm() {
+            document.getElementById("train").value = "";
+            document.getElementById("date").value = "";
+            document.getElementById("seat").value = "";
+            document.getElementById("message").innerHTML = "";
+            document.getElementById("price").innerHTML = "Price: ₹0";
+        }
+
+        function generateTicket(train, date, seat, price) {
+            let ticketContent = `
+                🚆 Railway Ticket 🎟️
+                ------------------------
+                Train: ${train}
+                Date: ${date}
+                Seat: ${seat}
+                Price: ₹${price}
+                ------------------------
+                ✅ Happy Journey!
+            `;
+
+            alert(ticketContent);
+        }
+    </script>
+
+</body>
+</html>
